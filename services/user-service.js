@@ -3,6 +3,7 @@ import uuid from "uuid";
 
 import UserModel from "../models/User.js"
 import MailService from "./mail-service.js"; 
+import TokenService from "./token-service.js";
 
 class UserService {
     async registration(fullName, email, password) {
@@ -23,6 +24,8 @@ class UserService {
             if(!user) throw new Error("Couldn't sign up");
 
             await MailService.sendActivationMail(email, activationLink);
+
+            const tokens = TokenService.generateTokens(newUser);
         } catch (err) {
             
         }
