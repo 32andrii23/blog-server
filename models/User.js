@@ -10,9 +10,16 @@ const UserSchema = new Schema({
         require: true,
         unique: true,
     },
-    passwordHash: {
+    password: {
         type: String,
         require: true,
+    },
+    isActivated: {
+        type: Boolean,
+        default: false,
+    },
+    activationLink: {
+        type: String,
     },
     profilePictureUrl: {
         type: String,

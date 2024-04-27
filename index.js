@@ -1,56 +1,25 @@
-import express from "express";
-const app = express();
-import dotenv from 'dotenv';
-dotenv.config();
-import mongoose from "mongoose";
-import multer from "multer";
+import express from 'express';
+import mongoose from 'mongoose';
+import 'dotenv/config'
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import router from './routers/auth.js';
 
-import { 
-    signUpValidation, 
-    signInValidation, 
-    postCreateValidation 
-} from "./middleware/validations.js";
-import verifyJWT from "./utils/verifyJWT.js";
-import * as UserController from "./controllers/user-controller.js";
-import * as PostController from "./controllers/post-controller.js";
-
-
+const app = express()
 const PORT = process.env.PORT || 3000;
 
-const storage = multer.diskStorage({
-    destination: (_, __, cb) => {
-        cb(null, "uploads");
-    },
-    filename: (_, file, cb) => {
-        cb(null, file.originalname)
-    }
-});
-
-const upload = multer({ storage });
-
 app.use(express.json());
-app.use("/uploads", express.static("uploads"))
+app.use(cookieParser());
+app.use(cors());
+app.use('/auth', router);
 
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log(";)"))
-    .catch((error) => console.log(":(", error));
+const start = async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_URL);
+        app.listen(PORT, () => console.log(`Server started on http://localhost:${PORT}`))
+    } catch (err) {
+        console.log(err);
+    }
+}
 
-app.post("/auth/sign-up", signUpValidation, UserController.signUp);
-app.post("/auth/sign-in", signInValidation, UserController.signIn);
-app.get("/auth/me", verifyJWT, UserController.getInfo);
-
-app.post("/upload", verifyJWT, upload.single("image"), (req, res) => {
-    res.json({
-        url: `/uploads/${req.file.originalname}`,
-    });
-});
-
-app.get("/posts", PostController.getAll);
-app.get("/posts/:id", PostController.getOne);
-app.post("/posts", verifyJWT, postCreateValidation, PostController.create);
-app.delete("/posts/:id", verifyJWT, PostController.remove);
-app.patch("/posts/:id", verifyJWT, PostController.update);
-
-app.listen(PORT, () => {
-    console.log(`Server started on http://localhost:${PORT}`);
-});
+start();
