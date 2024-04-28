@@ -2,84 +2,61 @@ import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
 
 import UserModel from "../models/User.js"
-import MailService from "./mail-service.js"; 
+import MailService from "./mail-service.js";
 import TokenService from "./token-service.js";
 import UserDto from "../dtos/user-dto.js";
+import ApiError from "../exceptions/api-error.js";
 
 class UserService {
     async registration(fullName, email, password) {
-        try {
-            const candidate = await UserModel.findOne({ email });
-            if(candidate) throw new Error("User already exists");
-            
-            const passwordHash = await bcrypt.hash(password, 10);
-            const activationLink = uuidv4();
+        const candidate = await UserModel.findOne({ email });
+        if (candidate) throw ApiError.BadRequest("User already exists");
 
-            const newUser = { 
-                fullName, 
-                email, 
-                password: passwordHash, 
-                activationLink 
-            }
-            const user = await UserModel.create(newUser);
-            if(!user) throw new Error("Couldn't sign up");
+        const passwordHash = await bcrypt.hash(password, 10);
+        const activationLink = uuidv4();
 
-            await MailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
+        const newUser = {
+            fullName,
+            email,
+            password: passwordHash,
+            activationLink
+        }
+        const user = await UserModel.create(newUser);
 
-            const userDto = new UserDto(user);
-            const tokens = TokenService.generateTokens({ ...userDto });
-            await TokenService.saveToken(userDto.id, tokens.refreshToken);
+        await MailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
 
-            return {
-                ...tokens,
-                user: userDto
-            }
-        } catch (err) {
-            console.log(err);
-            res.json({
-                message: "Couldn't sign up"
-            })
+        const userDto = new UserDto(user);
+        const tokens = TokenService.generateTokens({ ...userDto });
+        await TokenService.saveToken(userDto.id, tokens.refreshToken);
+
+        return {
+            ...tokens,
+            user: userDto
         }
     }
 
     async login(req, res, next) {
-        try {
-            
-        } catch (err) {
-            
-        }
+
     }
 
     async logout(req, res, next) {
-        try {
-            
-        } catch (err) {
-            
-        }
+
     }
 
-    async activate(req, res, next) {
-        try {
-            
-        } catch (err) {
-            
-        }
+    async activate(activationLink) {
+        const user = await UserModel.findOne({ activationLink });
+        if (!user) throw ApiError.BadRequest("Invalid link");
+        user.isActivated = true;
+        console.log("user: " + user);
+        await user.save();
     }
 
     async refresh(req, res, next) {
-        try {
-            
-        } catch (err) {
-            
-        }
+
     }
-    
+
     async getUsers(req, res, next) {
-        try {
-            res.json(["123", "456"])
-        } catch (err) {
-            
-        }
+
     }
 }
 

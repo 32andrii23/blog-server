@@ -4,6 +4,7 @@ import 'dotenv/config'
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import router from './routers/auth.js';
+import errorMiddleware from './middleware/error-middleware.js';
 
 const app = express()
 const PORT = process.env.PORT || 3000;
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
 app.use('/api', router);
+app.use(errorMiddleware);
 
 const start = async () => {
     try {

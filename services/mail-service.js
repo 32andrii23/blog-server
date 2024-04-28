@@ -18,7 +18,7 @@ class MailService {
         const mailOptions = {
             from: process.env.SMTP_USER,
             to,
-            subject: "Account activation on" + process.env.API_URL,
+            subject: "Account activation on " + process.env.API_URL,
             text: "",
             html: `
             <div>
@@ -29,8 +29,7 @@ class MailService {
         }
 
         await this.transporter.sendMail(mailOptions, (err, res) => {
-            if (err) console.log(err); 
-            else console.log(res);
+            if (err) console.log(err);
         })
     }
 }

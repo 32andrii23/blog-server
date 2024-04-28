@@ -13,7 +13,7 @@ class UserController {
 
             return res.json(UserData);  
         } catch (err) {
-            console.log(err);
+            next(err);
         }
     }
 
@@ -21,7 +21,7 @@ class UserController {
         try {
             
         } catch (err) {
-            
+            next(err);
         }
     }
 
@@ -29,15 +29,17 @@ class UserController {
         try {
             
         } catch (err) {
-            
+            console.log(err);
         }
     }
 
     async activate(req, res, next) {
         try {
-            
+            const activationLink = req.params.link;
+            await UserService.activate(activationLink);
+            return res.redirect(process.env.CLIENT_URL);
         } catch (err) {
-            
+            next(err);
         }
     }
 
@@ -45,7 +47,7 @@ class UserController {
         try {
             
         } catch (err) {
-            
+            next(err);
         }
     }
     
@@ -53,7 +55,7 @@ class UserController {
         try {
             res.json(["123", "456"])
         } catch (err) {
-            
+            next(err);
         }
     }
 }
