@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 
+import TokenModel from "../models/token.js"
+
 class TokenService {
     generateTokens(payload) {
         const accessToken = jwt.sign(

@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
-app.use('/auth', router);
+app.use('/api', router);
 
 const start = async () => {
     try {

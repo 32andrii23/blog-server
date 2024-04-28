@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import uuid from "uuid";
+import { v4 as uuidv4 } from 'uuid';
 
 import UserModel from "../models/User.js"
 import MailService from "./mail-service.js"; 
@@ -13,7 +13,7 @@ class UserService {
             if(candidate) throw new Error("User already exists");
             
             const passwordHash = await bcrypt.hash(password, 10);
-            const activationLink = uuid.v4();
+            const activationLink = uuidv4();
 
             const newUser = { 
                 fullName, 
@@ -24,13 +24,21 @@ class UserService {
             const user = await UserModel.create(newUser);
             if(!user) throw new Error("Couldn't sign up");
 
-            await MailService.sendActivationMail(email, activationLink);
+            await MailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
 
             const userDto = new UserDto(user);
             const tokens = TokenService.generateTokens({ ...userDto });
             await TokenService.saveToken(userDto.id, tokens.refreshToken);
+
+            return {
+                ...tokens,
+                user: userDto
+            }
         } catch (err) {
-            
+            console.log(err);
+            res.json({
+                message: "Couldn't sign up"
+            })
         }
     }
 
