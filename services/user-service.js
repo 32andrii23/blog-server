@@ -35,7 +35,9 @@ class UserService {
         }
     }
 
-    async login(req, res, next) {
+    async login(email, password) {
+        const candidate = await UserModel.findOne({ email });
+        if (!candidate) throw ApiError.BadRequest("User not found");
 
     }
 
