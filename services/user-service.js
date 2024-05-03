@@ -52,8 +52,9 @@ class UserService {
         }
     }
 
-    async logout(req, res, next) {
-
+    async logout(refreshToken) {
+        const token = TokenService.removeToken(refreshToken);
+        return token;
     }
 
     async activate(activationLink) {
