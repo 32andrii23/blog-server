@@ -84,7 +84,8 @@ class UserService {
     }
 
     async getUsers() {
-        
+        const users = await UserModel.find();
+        return users;
     }
 }
 
