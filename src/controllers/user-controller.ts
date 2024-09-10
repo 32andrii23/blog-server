@@ -1,10 +1,11 @@
 import { validationResult } from "express-validator";
+import { NextFunction, Request, Response } from "express";
 
-import UserService from "../services/user-service.js";
-import ApiError from "../exceptions/api-error.js";
+import UserService from "../services/user-service";
+import ApiError from "../exceptions/api-error";
 
 class UserController {
-    async registration(req, res, next) {
+    async registration(req: Request, res: Response, next: NextFunction) {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) next(ApiError.BadRequest("Validation error", errors.array()));
@@ -23,7 +24,7 @@ class UserController {
         }
     }
     
-    async login(req, res, next) {
+    async login(req: Request, res: Response, next: NextFunction) {
         try {
             const { email, password } = req.body;
             const userData = await UserService.login(email, password);
@@ -39,7 +40,7 @@ class UserController {
         }
     }
     
-    async logout(req, res, next) {
+    async logout(req: Request, res: Response, next: NextFunction) {
         try {
             const { refreshToken } = req.cookies;
             const token = UserService.logout(refreshToken);
@@ -52,17 +53,19 @@ class UserController {
         }
     }
 
-    async activate(req, res, next) {
+    async activate(req: Request, res: Response, next: NextFunction) {
         try {
             const activationLink = req.params.link;
             await UserService.activate(activationLink);
+            
+            if(!process.env.CLIENT_URL) throw new Error("CLIENT_URL is not defined");
             return res.redirect(process.env.CLIENT_URL);
         } catch (err) {
             next(err);
         }
     }
 
-    async refresh(req, res, next) {
+    async refresh(req: Request, res: Response, next: NextFunction) {
         try {
             const { refreshToken } = req.cookies;
             const userData = await UserService.refresh(refreshToken);
@@ -72,13 +75,13 @@ class UserController {
                 maxAge: 30 * 24 * 60 * 60 * 1000
             })
             
-            return res.json(userData);   б
+            return res.json(userData);
         } catch (err) {
             next(err);
         }
     }
     
-    async getUsers(req, res, next) {
+    async getUsers(req: Request, res: Response, next: NextFunction) {
         try {
             const users = await UserService.getUsers()
             return res.json(users);

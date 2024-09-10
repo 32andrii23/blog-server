@@ -21,9 +21,6 @@ const UserSchema = new Schema({
     activationLink: {
         type: String,
     },
-    profilePictureUrl: {
-        type: String,
-    },
 }, {
     timestamps: true,
 },

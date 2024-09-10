@@ -19,6 +19,7 @@ app.use(errorMiddleware);
 
 const start = async () => {
     try {
+        if(process.env.MONGODB_URL === undefined) throw new Error('MONGODB_URL is not defined');
         await mongoose.connect(process.env.MONGODB_URL);
         app.listen(PORT, () => console.log(`Server started on http://localhost:${PORT}`))
     } catch (err) {

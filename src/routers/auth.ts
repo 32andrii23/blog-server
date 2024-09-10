@@ -1,10 +1,10 @@
-import Router from "express";
+import express from "express";
 import { body } from "express-validator";
 
-import userController from "../controllers/user-controller.js";
-import authMiddleware from "../middleware/auth-middleware.js";
+import userController from "../controllers/user-controller";
+import authMiddleware from "../middleware/auth-middleware";
 
-const router = new Router();
+const router = express.Router();
 
 router.post(
     "/registration",

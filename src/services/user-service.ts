@@ -1,14 +1,14 @@
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from 'uuid';
 
-import UserModel from "../models/User.js"
-import MailService from "./mail-service.js";
-import TokenService from "./token-service.js";
-import UserDto from "../dtos/user-dto.js";
-import ApiError from "../exceptions/api-error.js";
+import UserModel from "../models/user"
+import MailService from "./mail-service";
+import TokenService from "./token-service";
+import UserDto from "../dtos/user-dto";
+import ApiError from "../exceptions/api-error";
 
 class UserService {
-    async registration(fullName, email, password) {
+    async registration(fullName: string, email: string, password: string) {
         const candidate = await UserModel.findOne({ email });
         if (candidate) throw ApiError.BadRequest("User already exists");
 
@@ -35,9 +35,9 @@ class UserService {
         }
     }
     
-    async login(email, password) {
+    async login(email: string, password: string) {
         const user = await UserModel.findOne({ email });
-        if (!user) throw ApiError.BadRequest("User not found");
+        if (!user || !user.password) throw ApiError.BadRequest("User not found");
         
         const isPassEquals = await bcrypt.compare(password, user.password);
         if(!isPassEquals) throw ApiError.BadRequest("Wrong password");
@@ -52,12 +52,12 @@ class UserService {
         }
     }
 
-    async logout(refreshToken) {
+    async logout(refreshToken: string) {
         const token = TokenService.removeToken(refreshToken);
         return token;
     }
 
-    async activate(activationLink) {
+    async activate(activationLink: string) {
         const user = await UserModel.findOne({ activationLink });
         if (!user) throw ApiError.BadRequest("Invalid link");
         user.isActivated = true;
@@ -65,7 +65,7 @@ class UserService {
         await user.save();
     }
 
-    async refresh(refreshToken) {
+    async refresh(refreshToken: string) {
         if(!refreshToken) throw ApiError.UnauthorizedError();
         
         const userData = TokenService.validateRefreshToken(refreshToken);

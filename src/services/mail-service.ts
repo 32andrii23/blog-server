@@ -1,6 +1,7 @@
-import nodemailer from "nodemailer";
+import nodemailer, { Transporter } from "nodemailer";
 
 class MailService {
+    private transporter: Transporter;
 
     constructor() {
         this.transporter = nodemailer.createTransport({
@@ -14,23 +15,26 @@ class MailService {
         });
     }
 
-    async sendActivationMail(to, link) {
+    async sendActivationMail(to: string, link: string) {
         const mailOptions = {
             from: process.env.SMTP_USER,
             to,
             subject: "Account activation on " + process.env.API_URL,
             text: "",
             html: `
-            <div>
-                <h1>Click on the link below to activate your account</h1>
-                <a href="${link}">${link}</a>
-            </div>
+                <div>
+                    <h1>Click on the link below to activate your account</h1>
+                    <a href="${link}">${link}</a>
+                </div>
             `
         }
 
-        await this.transporter.sendMail(mailOptions, (err, res) => {
-            if (err) console.log(err);
-        })
+        try {
+            await this.transporter.sendMail(mailOptions);
+            console.log("The message was sent");
+        } catch (err) {
+            console.log("Error occured", err);
+        }
     }
 }
 
